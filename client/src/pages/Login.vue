@@ -4,7 +4,7 @@ import { useRouter } from 'vue-router';
 import { useWebSocket, useStorage } from '@vueuse/core';
 
 const { status, data, send, open, close } = useWebSocket('ws://127.0.0.1:9502');
-const sessionStorage = useStorage('session', { username: null, token: null });
+const sessionStorage = useStorage('session', { userId: null, username: null, token: null });
 const router = useRouter();
 
 const username = ref('');
@@ -36,10 +36,11 @@ watch(data, () => {
 
   switch (parsedData.type) {
     case 'connect.success': {
+        sessionStorage.value.userId = parsedData.data.user_id;
         sessionStorage.value.username = parsedData.data.username;
         sessionStorage.value.token = parsedData.data.token;
 
-        router.replace({ name: 'chat' });
+        router.replace({ name: 'home' });
         break;
     }
 

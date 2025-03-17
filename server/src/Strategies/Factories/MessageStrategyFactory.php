@@ -2,7 +2,8 @@
 
 namespace App\Strategies\Factories;
 
-use App\Strategies\LoginStrategy;
+use App\Strategies\Session\LoginStrategy;
+use App\Strategies\Room\RoomCreateStrategy;
 use App\Strategies\StrategyInterface;
 
 class MessageStrategyFactory
@@ -12,6 +13,8 @@ class MessageStrategyFactory
         switch ($data['type']) {
             case 'connect': 
                 return new LoginStrategy($data['data']['username']);
+            case 'room.create':
+                return new RoomCreateStrategy($data['data']['title'], $data['data']['user_id']);
         }
 
         return null;

@@ -17,6 +17,9 @@ class Message
     {
         $data = json_decode($frame->data, associative: true);
 
+        echo 'Data: ' . PHP_EOL;
+        var_dump($data);
+
         $strategy = MessageStrategyFactory::choose($data);
         $strategy->handle($ws, $frame);
 
