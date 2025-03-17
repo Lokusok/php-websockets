@@ -8,6 +8,9 @@ class SessionService extends BaseService
 {
     public function login(string $username, string $token): int
     {
+        // If already have this id by this token - then simply pass it
+
+        // If no - start creating in db
         $userId = null;
 
         try {
