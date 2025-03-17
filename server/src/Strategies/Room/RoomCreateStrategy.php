@@ -40,7 +40,8 @@ class RoomCreateStrategy implements StrategyInterface
         SocketPool::broadcast($ws, json_encode([
             'type' => RoomEnum::ROOM_CREATE_SUCCESS->value,
             'data' => [
-                'room_id' => $roomId,
+                'id' => $roomId,
+                'user_id' => $this->userId,
                 'title' => $this->title,
             ]
         ]));

@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\PolicyException;
 use App\Exceptions\UniqueException;
 
 class RoomService extends BaseService
@@ -34,5 +35,29 @@ class RoomService extends BaseService
         }
 
         return $roomId;
+    }
+
+    public function deleteRoom(int $roomId, int $userId): int
+    {
+        // Check permission
+        $sql = "SELECT count(1) FROM rooms WHERE id = :room_id AND user_id = :user_id";
+        $stmt = $this->connection->getConnection()->prepare($sql);
+        $stmt->bindParam(':room_id', $roomId);
+        $stmt->bindParam(':user_id', $userId);
+        $stmt->execute();
+        $result = $stmt->fetchColumn();
+
+        if (! $result) {
+            throw new PolicyException('Cannot perform delete on this room by your session');
+        }
+
+        // Then Delete
+        $sql = "DELETE FROM rooms WHERE id = :room_id";
+        $stmt = $this->connection->getConnection()->prepare($sql);
+        $stmt->bindParam(':room_id', $roomId);
+        $stmt->execute();
+        $affectedRowsByDelete = $stmt->rowCount();
+        
+        return $affectedRowsByDelete;
     }
 }

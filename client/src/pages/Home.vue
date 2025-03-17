@@ -18,6 +18,7 @@ if (! sessionStorage.value.token) {
 const roomTitle = ref('');
 const rooms = ref([]);
 const error = ref('');
+const waiting = ref(false);
 
 const callbacks = {
     fetchAllRooms() {
@@ -37,6 +38,19 @@ const callbacks = {
 
         roomTitle.value = '';
     },
+
+    deleteRoom(roomId) {
+        console.log('Delete: ' + roomId);
+
+        send(JSON.stringify({
+            type: 'room.delete',
+            data: {
+                user_id: sessionStorage.value.userId,
+                room_id: roomId
+            },
+        }));
+        waiting.value = true;
+    }
 };
 
 onMounted(() => {
@@ -47,6 +61,8 @@ watch(data, () => {
     const parsedData = JSON.parse(data.value);
 
     error.value = '';
+
+    console.log(parsedData);
 
     switch (parsedData.type) {
         case 'room.create.success': {
@@ -61,7 +77,13 @@ watch(data, () => {
             rooms.value = parsedData.data;
             break;
         }
+        case 'room.delete.success': {
+            rooms.value = rooms.value.filter((r) => r.id !== parsedData.data.deleted_id);
+            break;
+        }
     }
+
+    waiting.value = false;
 });
 </script>
 
@@ -103,7 +125,13 @@ watch(data, () => {
         >
             {{ room.title }}
             <br>
-            <button v-if="room.user_id === sessionStorage.userId">Delete</button>
+            <button
+                v-if="room.user_id === sessionStorage.userId"
+                :disabled="waiting"
+                @click="callbacks.deleteRoom(room.id)"
+            >
+                Delete
+            </button>
             <br>
             <router-link>Join room</router-link>
             <hr>
