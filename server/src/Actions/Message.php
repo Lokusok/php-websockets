@@ -2,9 +2,8 @@
 
 namespace App\Actions;
 
-use App\Connection\Connection;
-use App\Exceptions\UniqueException;
 use App\Services\SessionService;
+use App\Strategies\Factories\MessageStrategyFactory;
 use Swoole\WebSocket\Frame;
 use Swoole\WebSocket\Server;
 
@@ -18,32 +17,8 @@ class Message
     {
         $data = json_decode($frame->data, associative: true);
 
-        if ($data['type'] === 'connect')  {
-            $username = $data['data']['username'];
-            $token = bin2hex(random_bytes(28));
-    
-            try {
-                $this->sessionService->login($username, $token);
-            } catch (UniqueException $exception) {
-                $ws->push($frame->fd, json_encode([
-                    'type' => 'connect.error',
-                    'data' => [
-                        'message' => $exception->getMessage(),
-                    ],
-                ]));
-                return;
-            }
-
-            $ws->push($frame->fd, json_encode([
-                'type' => 'connect.success',
-                'data' => [
-                    'username' => $username,
-                    'token' => $token,
-                ]
-            ]));
-
-            return;
-        }
+        $strategy = MessageStrategyFactory::choose($data);
+        $strategy->handle($ws, $frame);
 
         $ws->push($frame->fd, "server: {$frame->data}");
     }
