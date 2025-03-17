@@ -8,7 +8,7 @@ class RoomService extends BaseService
 {
     public function getAllRooms(): array
     {
-        $sql = "SELECT id, title FROM rooms";
+        $sql = "SELECT id, title, user_id FROM rooms ORDER BY id DESC";
         $stmt = $this->connection->getConnection()->query($sql);
         $rooms = $stmt->fetchAll();
 

@@ -1,9 +1,19 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
-import { useStorage, useWebSocket } from '@vueuse/core';
+import { useRouter } from 'vue-router';
+import { useWebSocket } from '@vueuse/core';
 
-const { status, data, send, open, close } = useWebSocket('ws://127.0.0.1:9502');
-const sessionStorage = useStorage('session', { userId: null, username: null, token: null });
+import wsConfig from '../config/ws';
+import useSessionStorage from '../composables/useSessionStorage';
+
+const { status, data, send, open, close } = useWebSocket(wsConfig.url);
+const sessionStorage = useSessionStorage();
+
+const router = useRouter();
+
+if (! sessionStorage.value.token) {
+    router.replace({ name: 'login' });
+}
 
 const roomTitle = ref('');
 const rooms = ref([]);
@@ -35,8 +45,15 @@ onMounted(() => {
 watch(data, () => {
     const parsedData = JSON.parse(data.value);
 
-    if (parsedData.type === 'room.fetch_all.success') {
-        rooms.value = parsedData.data;
+    switch (parsedData.type) {
+        case 'room.create.success': {
+            rooms.value.push(parsedData.data);
+            break;
+        }
+        case 'room.fetch_all.success': {
+            rooms.value = parsedData.data;
+            break;
+        }
     }
 });
 </script>
@@ -70,15 +87,19 @@ watch(data, () => {
 
     <hr>
 
-    <ul>
+    <ul v-if="rooms.length">
         <li 
             v-for="room in rooms"
             :key="room.id"
         >
             {{ room.title }}
             <br>
+            <button v-if="room.user_id === sessionStorage.userId">Delete</button>
+            <br>
             <router-link>Join room</router-link>
+            <hr>
         </li>
     </ul>
 
+    <p v-else>Rooms not found...</p>
 </template>

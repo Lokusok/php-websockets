@@ -1,10 +1,13 @@
 <script setup>
 import { ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useWebSocket, useStorage } from '@vueuse/core';
+import { useWebSocket } from '@vueuse/core';
 
-const { status, data, send, open, close } = useWebSocket('ws://127.0.0.1:9502');
-const sessionStorage = useStorage('session', { userId: null, username: null, token: null });
+import wsConfig from '../config/ws';
+import useSessionStorage from '../composables/useSessionStorage';
+
+const { status, data, send, open, close } = useWebSocket(wsConfig.url);
+const sessionStorage = useSessionStorage();
 const router = useRouter();
 
 const username = ref('');
