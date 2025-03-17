@@ -17,6 +17,7 @@ if (! sessionStorage.value.token) {
 
 const roomTitle = ref('');
 const rooms = ref([]);
+const error = ref('');
 
 const callbacks = {
     fetchAllRooms() {
@@ -45,9 +46,15 @@ onMounted(() => {
 watch(data, () => {
     const parsedData = JSON.parse(data.value);
 
+    error.value = '';
+
     switch (parsedData.type) {
         case 'room.create.success': {
-            rooms.value.push(parsedData.data);
+            rooms.value.unshift(parsedData.data);
+            break;
+        }
+        case 'room.create.error': {
+            error.value = parsedData.data.message;
             break;
         }
         case 'room.fetch_all.success': {
@@ -69,6 +76,8 @@ watch(data, () => {
         <details>
             <summary>Want create new room?</summary>
             
+            <p v-if="error" style="color: red">{{ error }}</p>
+
             <form @submit.prevent="callbacks.createRoom">
                 <label>
                     Room title:
