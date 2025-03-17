@@ -30,8 +30,6 @@ watch(data, () => {
 
   error.value = '';
 
-  console.log(parsedData);
-
   waiting.value = false;
 
   switch (parsedData.type) {

@@ -23,8 +23,6 @@ class RoomCreateStrategy implements StrategyInterface
      
         try {
             $roomId = $this->roomService->createRoom($this->title, $this->userId);
-            echo 'Room id: ' . PHP_EOL;
-            var_dump($roomId);
         } catch (UniqueException $exception) {
             $ws->send($frame->fd, json_encode([
                 'room.create.error',

@@ -1,16 +1,21 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { useStorage, useWebSocket } from '@vueuse/core';
 
 const { status, data, send, open, close } = useWebSocket('ws://127.0.0.1:9502');
 const sessionStorage = useStorage('session', { userId: null, username: null, token: null });
 
 const roomTitle = ref('');
+const rooms = ref([]);
 
 const callbacks = {
-    createRoom() {
-        console.log('Sending: ' + roomTitle.value.trim());
+    fetchAllRooms() {
+        send(JSON.stringify({
+            type: 'room.fetch_all',
+        }));
+    },
 
+    createRoom() {
         send(JSON.stringify({
             type: 'room.create',
             data: {
@@ -23,9 +28,16 @@ const callbacks = {
     },
 };
 
+onMounted(() => {
+    callbacks.fetchAllRooms();
+});
+
 watch(data, () => {
     const parsedData = JSON.parse(data.value);
-    console.log(parsedData);
+
+    if (parsedData.type === 'room.fetch_all.success') {
+        rooms.value = parsedData.data;
+    }
 });
 </script>
 
@@ -57,5 +69,16 @@ watch(data, () => {
     <h1>Rooms overview</h1>
 
     <hr>
-    
+
+    <ul>
+        <li 
+            v-for="room in rooms"
+            :key="room.id"
+        >
+            {{ room.title }}
+            <br>
+            <router-link>Join room</router-link>
+        </li>
+    </ul>
+
 </template>
