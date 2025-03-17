@@ -3,6 +3,7 @@
 namespace App\Strategies\Room;
 
 use App\Exceptions\UniqueException;
+use App\MessageTypes\RoomEnum;
 use App\Pools\SocketPool;
 use App\Services\RoomService;
 use App\Strategies\StrategyInterface;
@@ -26,7 +27,7 @@ class RoomCreateStrategy implements StrategyInterface
             $roomId = $this->roomService->createRoom($this->title, $this->userId);
         } catch (UniqueException $exception) {
             $ws->send($frame->fd, json_encode([
-                'room.create.error',
+                RoomEnum::ROOM_CREATE_ERROR->value,
                 'data' => [
                     'message' => $exception->getMessage(),
                 ]
@@ -35,7 +36,7 @@ class RoomCreateStrategy implements StrategyInterface
         }
 
         SocketPool::broadcast($ws, json_encode([
-            'type' => 'room.create.success',
+            'type' => RoomEnum::ROOM_CREATE_SUCCESS->value,
             'data' => [
                 'room_id' => $roomId,
                 'title' => $this->title,

@@ -3,6 +3,7 @@
 namespace App\Strategies\Session;
 
 use App\Exceptions\UniqueException;
+use App\MessageTypes\ConnectEnum;
 use App\Services\SessionService;
 use App\Strategies\StrategyInterface;
 use Swoole\WebSocket\Frame;
@@ -25,7 +26,7 @@ class LoginStrategy implements StrategyInterface
             $userId = $this->sessionService->login($username, $token);
         } catch (UniqueException $exception) {
             $ws->push($frame->fd, json_encode([
-                'type' => 'connect.error',
+                'type' => ConnectEnum::CONNECT_ERROR->value,
                 'data' => [
                     'message' => $exception->getMessage(),
                 ],
@@ -34,7 +35,7 @@ class LoginStrategy implements StrategyInterface
         }
 
         $ws->push($frame->fd, json_encode([
-            'type' => 'connect.success',
+            'type' => ConnectEnum::CONNECT_SUCCESS->value,
             'data' => [
                 'user_id' => $userId,
                 'username' => $username,
