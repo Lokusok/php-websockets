@@ -9,6 +9,7 @@ const router = useRouter();
 
 const username = ref('');
 const waiting = ref(false);
+const error = ref('');
 
 const callbacks = {
   login() {
@@ -27,6 +28,10 @@ const callbacks = {
 watch(data, () => {
   const parsedData = JSON.parse(data.value);
 
+  error.value = '';
+
+  console.log(parsedData);
+
   waiting.value = false;
 
   switch (parsedData.type) {
@@ -37,6 +42,11 @@ watch(data, () => {
         router.replace({ name: 'chat' });
         break;
     }
+
+    case 'connect.error': {
+      error.value = parsedData.data.message;
+      break;
+    }
   };
 });
 </script>
@@ -45,6 +55,7 @@ watch(data, () => {
   <h1>Login</h1>
 
   <p v-if="waiting">Loading...</p>
+  <p v-if="error" style="color: red">{{ error }}</p>
 
   <form @submit.prevent="callbacks.login">
     <input v-model="username" type="username">
