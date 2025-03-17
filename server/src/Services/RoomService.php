@@ -6,9 +6,13 @@ use App\Exceptions\UniqueException;
 
 class RoomService extends BaseService
 {
-    public function getAllRooms()
+    public function getAllRooms(): array
     {
-        // Logic for fetching all rooms
+        $sql = "SELECT id, title FROM rooms";
+        $stmt = $this->connection->getConnection()->query($sql);
+        $rooms = $stmt->fetchAll();
+
+        return $rooms;
     }
 
     public function createRoom(string $title, int $userId): int

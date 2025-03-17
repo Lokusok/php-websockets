@@ -9,6 +9,10 @@ class Open
 {
     public static function handle(Server $ws, Request $request)
     {
-        $ws->push($request->fd, "hello, welcome\n");
+        $ws->push($request->fd, json_encode([
+            'data' => [
+                'message' => 'Hello, Welcome'
+            ]
+        ]));
     }
 }

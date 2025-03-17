@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Database\Enums\Errors;
 use App\Exceptions\UniqueException;
 
 class SessionService extends BaseService
