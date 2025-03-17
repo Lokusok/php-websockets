@@ -26,8 +26,10 @@ class RoomCreateStrategy implements StrategyInterface
         try {
             $roomId = $this->roomService->createRoom($this->title, $this->userId);
         } catch (UniqueException $exception) {
-            $ws->send($frame->fd, json_encode([
-                RoomEnum::ROOM_CREATE_ERROR->value,
+            echo 'Error happened: ' . $exception->getMessage();
+            echo '---------------------' . PHP_EOL;
+            $ws->push($frame->fd, json_encode([
+                'type' => RoomEnum::ROOM_CREATE_ERROR->value,
                 'data' => [
                     'message' => $exception->getMessage(),
                 ]
