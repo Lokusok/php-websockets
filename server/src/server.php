@@ -15,7 +15,7 @@ $ws = new Server('0.0.0.0', $port);
 
 $ws->on('Start', Start::handle(...));
 $ws->on('Open', Open::handle(...));
-$ws->on('Message', Message::handle(...));
+$ws->on('Message', [new Message, 'handle']);
 $ws->on('Close', Close::handle(...));
 
 $ws->start();
