@@ -3,6 +3,7 @@
 namespace App\Strategies\Room;
 
 use App\MessageTypes\RoomEnum;
+use App\Pools\SocketPool;
 use App\Services\RoomService;
 use App\Strategies\StrategyInterface;
 use Swoole\WebSocket\Frame;
@@ -20,6 +21,16 @@ class RoomExitStrategy implements StrategyInterface
     public function handle(Server $ws, Frame $frame): void
     {
         $this->roomService->exitRoom($this->roomId, $this->userId);
+
+        $usersPerRoom = $this->roomService->usersPerRoom();
+
+        SocketPool::broadcast($ws, json_encode([
+            'type' => RoomEnum::ROOM_USERS_TOTAL->value,
+            'data' => [
+                'users_total' => $usersPerRoom,
+            ],
+        ]));
+
         $ws->push($frame->fd, json_encode([
             'type' => RoomEnum::ROOM_EXIT_SUCCESS->value,
             'data' => [

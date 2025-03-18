@@ -67,6 +67,16 @@ const callbacks = {
             },
         }));
     },
+
+    exitRoom(roomId) {
+        send(JSON.stringify({
+            type: 'room.exit',
+            data: {
+                user_id: sessionStorage.value.userId,
+                room_id: roomId,
+            },
+        }));
+    },
 };
 
 onMounted(() => {
@@ -92,7 +102,7 @@ watch(data, () => {
         case 'room.fetch_all.success': {
             rooms.value = parsedData.data.rooms;
             rooms.value = rooms.value.map((r) => {
-                r.currentUserIn = parsedData.data.current_user_in[sessionStorage.value.userId];
+                r.currentUserIn = parsedData.data.current_user_in[r.id];
                 return r;
             });
             break;
@@ -103,7 +113,20 @@ watch(data, () => {
         }
         case 'room.join.success': {
             const room = rooms.value.find((r) => r.id === parsedData.data.room_id);
-            room.users_total = parsedData.data.users_total;
+            room.currentUserIn = true;
+            break;
+        }
+        case 'room.exit.success': {
+            const room = rooms.value.find((r) => r.id === parsedData.data.room_id);
+            room.currentUserIn = false;
+            break;
+        }
+        case 'room.users_total': {
+            rooms.value = rooms.value.map((r) => {
+                r.users_total = parsedData.data.users_total[r.id] ?? 0;
+                return r;
+            });
+            break;
         }
     }
 
@@ -163,6 +186,7 @@ watch(data, () => {
             </button>
             <br>
             <button v-if="! room.currentUserIn" @click="callbacks.joinRoom(room.id)">Join room</button>
+            <button v-else @click="callbacks.exitRoom(room.id)">Exit room</button>
             <hr>
         </li>
     </ul>

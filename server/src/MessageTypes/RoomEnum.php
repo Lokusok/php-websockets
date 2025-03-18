@@ -19,4 +19,6 @@ enum RoomEnum: string
 
     case ROOM_EXIT = 'room.exit';
     case ROOM_EXIT_SUCCESS = 'room.exit.success';
+
+    case ROOM_USERS_TOTAL = 'room.users_total';
 }

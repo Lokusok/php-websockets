@@ -23,6 +23,6 @@ class Message
         $strategy = MessageStrategyFactory::choose($data);
         $strategy->handle($ws, $frame);
 
-        $ws->push($frame->fd, "server: {$frame->data}");
+        // $ws->push($frame->fd, "server: {$frame->data}");
     }
 }

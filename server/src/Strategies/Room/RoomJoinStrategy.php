@@ -3,6 +3,7 @@
 namespace App\Strategies\Room;
 
 use App\MessageTypes\RoomEnum;
+use App\Pools\SocketPool;
 use App\Services\RoomService;
 use App\Strategies\StrategyInterface;
 use Swoole\WebSocket\Frame;
@@ -21,13 +22,20 @@ class RoomJoinStrategy implements StrategyInterface
     {
         $this->roomService->joinRoom($this->roomId, $this->userId);
 
-        $countUsersInRoom = $this->roomService->countUsersInRoom($this->roomId);
+        $usersPerRoom = $this->roomService->usersPerRoom();
+
+        SocketPool::broadcast($ws, json_encode([
+            'type' => RoomEnum::ROOM_USERS_TOTAL->value,
+            'data' => [
+                'users_total' => $usersPerRoom,
+            ],
+        ]));
 
         $ws->push($frame->fd, json_encode([
             'type' => RoomEnum::ROOM_JOIN_SUCCESS->value,
             'data' => [
                 'room_id' => $this->roomId,
-                'users_count' => $countUsersInRoom,
+                'user_id' => $this->userId,
             ],
         ]));
     }

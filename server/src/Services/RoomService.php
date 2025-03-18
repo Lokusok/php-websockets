@@ -67,6 +67,26 @@ class RoomService extends BaseService
     }
 
     /**
+     * Get count of users per every room
+     *
+     * @return array<int, int>
+     */
+    public function usersPerRoom(): array
+    {
+        $sql = "SELECT ru.room_id , COUNT(1) as total FROM room_user ru
+                GROUP BY ru.room_id";
+        $stmt = $this->connection->getConnection()->prepare($sql);
+        $stmt->execute();
+        $usersPerRoom =  [];
+
+        while ($room = $stmt->fetch()) {
+            $usersPerRoom[$room['room_id']] = $room['total'];
+        }
+
+        return $usersPerRoom;
+    }
+
+    /**
      * Get rooms ids where user with given id inside
      *
      * @return array<int, int>
