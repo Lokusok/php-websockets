@@ -2,28 +2,29 @@
 
 namespace App\Strategies\Room;
 
+use App\MessageTypes\RoomEnum;
 use App\Services\RoomService;
 use App\Strategies\StrategyInterface;
-use Swoole\WebSocket\Server;
 use Swoole\WebSocket\Frame;
+use Swoole\WebSocket\Server;
 
-class RoomFetchAllStrategy implements StrategyInterface
+class RoomExitStrategy implements StrategyInterface
 {
     public function __construct(
+        private int $roomId,
         private int $userId,
         private RoomService $roomService = new RoomService,
-    ) {}
+    )
+    {}
 
     public function handle(Server $ws, Frame $frame): void
     {
-        $rooms = $this->roomService->getAllRooms();
-        $roomsWhereCurrentUserIn = $this->roomService->roomsByUser($this->userId);
-
+        $this->roomService->exitRoom($this->roomId, $this->userId);
         $ws->push($frame->fd, json_encode([
-            'type' => 'room.fetch_all.success',
+            'type' => RoomEnum::ROOM_EXIT_SUCCESS->value,
             'data' => [
-                'rooms' => $rooms,
-                'current_user_in' => $roomsWhereCurrentUserIn,
+                'room_id' => $this->roomId,
+                'user_id' => $this->userId,
             ],
         ]));
     }

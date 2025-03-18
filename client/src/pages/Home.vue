@@ -24,6 +24,9 @@ const callbacks = {
     fetchAllRooms() {
         send(JSON.stringify({
             type: 'room.fetch_all',
+            data: {
+                user_id: sessionStorage.value.userId,
+            },
         }));
     },
 
@@ -40,8 +43,6 @@ const callbacks = {
     },
 
     deleteRoom(roomId) {
-        console.log('Delete: ' + roomId);
-
         send(JSON.stringify({
             type: 'room.delete',
             data: {
@@ -50,7 +51,22 @@ const callbacks = {
             },
         }));
         waiting.value = true;
-    }
+    },
+
+    joinRoom(roomId) {
+        console.log('Join to room: ', {
+                user_id: sessionStorage.value.userId,
+                room_id: roomId,
+            });
+
+        send(JSON.stringify({
+            type: 'room.join',
+            data: {
+                user_id: sessionStorage.value.userId,
+                room_id: roomId,
+            },
+        }));
+    },
 };
 
 onMounted(() => {
@@ -74,12 +90,20 @@ watch(data, () => {
             break;
         }
         case 'room.fetch_all.success': {
-            rooms.value = parsedData.data;
+            rooms.value = parsedData.data.rooms;
+            rooms.value = rooms.value.map((r) => {
+                r.currentUserIn = parsedData.data.current_user_in[sessionStorage.value.userId];
+                return r;
+            });
             break;
         }
         case 'room.delete.success': {
             rooms.value = rooms.value.filter((r) => r.id !== parsedData.data.deleted_id);
             break;
+        }
+        case 'room.join.success': {
+            const room = rooms.value.find((r) => r.id === parsedData.data.room_id);
+            room.users_total = parsedData.data.users_total;
         }
     }
 
@@ -123,7 +147,12 @@ watch(data, () => {
             v-for="room in rooms"
             :key="room.id"
         >
-            {{ room.title }}
+            <span>
+                {{ room.title }}
+            </span>
+            <span v-if="room.users_total">
+                &nbsp;({{ room.users_total }})
+            </span>
             <br>
             <button
                 v-if="room.user_id === sessionStorage.userId"
@@ -133,7 +162,7 @@ watch(data, () => {
                 Delete
             </button>
             <br>
-            <router-link>Join room</router-link>
+            <button v-if="! room.currentUserIn" @click="callbacks.joinRoom(room.id)">Join room</button>
             <hr>
         </li>
     </ul>
