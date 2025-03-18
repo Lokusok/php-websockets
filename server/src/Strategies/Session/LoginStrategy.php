@@ -13,13 +13,14 @@ class LoginStrategy implements StrategyInterface
 {
     public function __construct(
         private string $username,
+        private ?string $token,
         private SessionService $sessionService = new SessionService,
     ) {}
 
     public function handle(Server $ws, Frame $frame): void
     {
         $username = $this->username;
-        $token = bin2hex(random_bytes(28));
+        $token = $this->token ?? bin2hex(random_bytes(28));
         $userId = null;
 
         try {

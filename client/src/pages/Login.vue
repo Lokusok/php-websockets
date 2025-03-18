@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useWebSocket } from '@vueuse/core';
 
@@ -13,6 +13,16 @@ const router = useRouter();
 const username = ref('');
 const waiting = ref(false);
 const error = ref('');
+
+onMounted(() => {
+  send(JSON.stringify({
+    type: 'connect',
+    data: {
+      username: sessionStorage.value.username,
+      token: sessionStorage.value.token,
+    }
+  }));
+});
 
 const callbacks = {
   login() {

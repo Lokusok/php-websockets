@@ -9,6 +9,15 @@ class SessionService extends BaseService
     public function login(string $username, string $token): int
     {
         // If already have this id by this token - then simply pass it
+        $sql = "SELECT id FROM users WHERE token = :token";
+        $stmt = $this->connection->getConnection()->prepare($sql);
+        $stmt->bindParam(':token', $token);
+        $stmt->execute();
+        $userId = $stmt->fetchColumn();
+
+        if ($userId) {
+            return $userId;
+        }
 
         // If no - start creating in db
         $userId = null;

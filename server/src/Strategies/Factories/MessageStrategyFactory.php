@@ -16,7 +16,7 @@ class MessageStrategyFactory
     {
         switch ($data['type']) {
             case ConnectEnum::CONNECT_OPEN->value: 
-                return new LoginStrategy($data['data']['username']);
+                return new LoginStrategy($data['data']['username'], $data['data']['token']);
             case RoomEnum::ROOM_FETCH_ALL->value:
                 return new RoomFetchAllStrategy;
             case RoomEnum::ROOM_CREATE->value:
