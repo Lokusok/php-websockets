@@ -8,13 +8,23 @@ class Connection
     private const string USER = '';
     private const string PASSWORD = '';
 
+    private static ?\PDO $instance = null;
     private \PDO $conn;
 
-    public function __construct()
+    private function __construct()
     {
-        $this->conn = new \PDO(self::DSN, self::USER, self::PASSWORD, [
-            \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
-        ]);
+        $this->conn = self::$instance;
+    }
+
+    public static function create(): self
+    {
+        if (! self::$instance) {
+            self::$instance = new \PDO(self::DSN, self::USER, self::PASSWORD, [
+                \PDO::ATTR_DEFAULT_FETCH_MODE => \PDO::FETCH_ASSOC,
+            ]);
+        }
+
+        return new self(self::$instance);
     }
 
     public function getConnection(): \PDO
