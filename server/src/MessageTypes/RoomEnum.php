@@ -22,4 +22,16 @@ enum RoomEnum: string
     case ROOM_EXIT_SUCCESS = 'room.exit.success';
 
     case ROOM_USERS_TOTAL = 'room.users_total';
+
+    case ROOM_MESSAGE_FETCH_ALL = 'room.message.fetch_all';
+    case ROOM_MESSAGE_FETCH_ALL_SUCCESS = 'room.message.fetch_all.success';
+    case ROOM_MESSAGE_SEND = 'room.message.send';
+
+    public function roomMessageSendTo(int $roomId): string
+    {
+        return match ($this) {
+            self::ROOM_MESSAGE_SEND => "room_{$roomId}_" . $this->value,
+            default => $this->value,
+        };
+    }
 }

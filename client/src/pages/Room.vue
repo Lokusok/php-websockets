@@ -10,7 +10,11 @@ const props = defineProps({
 const { status, data, send, open, close } = props.ws;
 const sessionStorage = useSessionStorage();
 
+const messageContent = ref('');
 const usersTotalInRoom = ref(null);
+const messages = ref([]);
+
+const waitingMessageSend = ref(false);
 const waitingExit = ref(false);
 
 const router = useRouter();
@@ -42,10 +46,33 @@ const callbacks = {
 
         waitingExit.value = true;
     },
+
+    fetchAllMessages() {
+        send(JSON.stringify({
+            type: 'room.message.fetch_all',
+            data: {
+                room_id: route.params.id,
+            },
+        }));
+    },
+
+    sendMessage() {
+        send(JSON.stringify({
+            type: 'room.message.send',
+            data: {
+                user_id: sessionStorage.value.userId,
+                room_id: route.params.id,
+                content: messageContent.value.trim(),
+            }
+        }));
+        waitingMessageSend.value = true;
+        messageContent.value = '';
+    }
 };
 
 onMounted(() => {
     callbacks.joinRoom();
+    callbacks.fetchAllMessages();
 });
 
 watch(data, () => {
@@ -60,6 +87,15 @@ watch(data, () => {
         }
         case 'room.users_total': {
             usersTotalInRoom.value = parsedData.data.users_total[route.params.id];
+            break;
+        }
+        case 'room.message.fetch_all.success': {
+            messages.value = parsedData.data.messages;
+            break;
+        }
+        case `room_${route.params.id}_room.message.send`: {
+            messages.value = parsedData.data.messages;
+            waitingMessageSend.value = false;
             break;
         }
     }
@@ -80,9 +116,23 @@ watch(data, () => {
         <span v-if="usersTotalInRoom">({{ usersTotalInRoom }})</span>
     </h1>
     <hr>
-    <form>
+    <form @submit.prevent="callbacks.sendMessage">
         <label>Message</label>
-        <textarea rows="6"></textarea>
-        <button>Send message</button>
+        <textarea v-model="messageContent" rows="6"></textarea>
+        <button
+            :disabled="! messageContent || waitingMessageSend"
+            type="submit"
+        >
+            Send message
+        </button>
     </form>
+    <ul>
+        <li v-for="message in messages" :key="message.message_id">
+            <strong>{{ message.username }}</strong>
+            <p>
+                {{ message.content }}
+            </p>
+            <hr>
+        </li>
+    </ul>
 </template>

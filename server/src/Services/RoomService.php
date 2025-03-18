@@ -149,4 +149,33 @@ class RoomService extends BaseService
         $stmt->bindParam(':user_id', $userId);
         $stmt->execute();
     }
+    
+    public function sendMessage(int $roomId, int $userId, string $content): int
+    {
+        $sql = "INSERT INTO messages (room_id, user_id, content) VALUES (:room_id, :user_id, :content)";
+        $stmt = $this->connection->getConnection()->prepare($sql);
+        $stmt->bindParam(':room_id', $roomId);
+        $stmt->bindParam(':user_id', $userId);
+        $stmt->bindParam(':content', $content);
+        $stmt->execute();
+
+        $messageId = $this->connection->getConnection()->lastInsertId();
+
+        return $messageId;
+    }
+
+    public function getAllMessagesFromRoom(int $roomId): array
+    {
+        $sql = "SELECT m.id message_id, m.content, m.room_id, u.id user_id, u.username FROM messages m
+                INNER JOIN users u on m.user_id = u.id
+                WHERE m.room_id = :room_id
+                ORDER BY m.id DESC";
+        $stmt = $this->connection->getConnection()->prepare($sql);
+        $stmt->bindParam(':room_id', $roomId);
+        $stmt->execute();
+
+        $messages = $stmt->fetchAll();
+
+        return $messages;
+    }
 }
