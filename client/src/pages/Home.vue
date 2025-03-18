@@ -52,31 +52,6 @@ const callbacks = {
         }));
         waiting.value = true;
     },
-
-    joinRoom(roomId) {
-        console.log('Join to room: ', {
-                user_id: sessionStorage.value.userId,
-                room_id: roomId,
-            });
-
-        send(JSON.stringify({
-            type: 'room.join',
-            data: {
-                user_id: sessionStorage.value.userId,
-                room_id: roomId,
-            },
-        }));
-    },
-
-    exitRoom(roomId) {
-        send(JSON.stringify({
-            type: 'room.exit',
-            data: {
-                user_id: sessionStorage.value.userId,
-                room_id: roomId,
-            },
-        }));
-    },
 };
 
 onMounted(() => {
@@ -136,12 +111,6 @@ watch(data, () => {
 
 <template>
     <div>
-        <h3>Login as: {{ sessionStorage.username }}</h3>
-    </div>
-
-    <hr>
-
-    <div>
         <details>
             <summary>Want create new room?</summary>
             
@@ -176,17 +145,25 @@ watch(data, () => {
             <span v-if="room.users_total">
                 &nbsp;({{ room.users_total }})
             </span>
-            <br>
-            <button
-                v-if="room.user_id === sessionStorage.userId"
-                :disabled="waiting"
-                @click="callbacks.deleteRoom(room.id)"
+            <router-link
+                :to="{ name: 'room', params: { id: room.id } }"
+                @click="callbacks.joinRoom(room.id)"
             >
-                Delete
-            </button>
+                Join room
+            </router-link>
             <br>
-            <button v-if="! room.currentUserIn" @click="callbacks.joinRoom(room.id)">Join room</button>
-            <button v-else @click="callbacks.exitRoom(room.id)">Exit room</button>
+            <br>
+            <div style="display: flex; gap: 10px;">
+                <button
+                    v-if="room.user_id === sessionStorage.userId"
+                    :disabled="waiting"
+                    @click="callbacks.deleteRoom(room.id)"
+                >
+                    Delete
+                </button>
+    
+                <button v-if="room.currentUserIn" @click="callbacks.exitRoom(room.id)">Exit room</button>
+            </div>
             <hr>
         </li>
     </ul>

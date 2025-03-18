@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Exceptions\AlreadyInRoomException;
 use App\Exceptions\PolicyException;
 use App\Exceptions\UniqueException;
 
@@ -10,7 +11,7 @@ class RoomService extends BaseService
     public function getAllRooms(): array
     {
         $sql = "SELECT id, title, user_id, rg.users_total FROM rooms r
-                INNER JOIN (
+                LEFT JOIN (
                     SELECT ru.room_id , COUNT(1) as users_total FROM room_user ru
                     GROUP BY ru.room_id
                 ) rg ON r.id = rg.room_id
@@ -120,6 +121,19 @@ class RoomService extends BaseService
 
     public function joinRoom(int $roomId, int $userId): void
     {
+        // If in room - abrupt
+        $sql = "SELECT COUNT(1) FROM room_user WHERE room_id = :room_id AND user_id = :user_id";
+        $stmt = $this->connection->getConnection()->prepare($sql);
+        $stmt->bindParam(':room_id', $roomId);
+        $stmt->bindParam(':user_id', $userId);
+        $stmt->execute();
+        $countInRooms = $stmt->fetchColumn();
+
+        if ($countInRooms >= 1) {
+            throw new AlreadyInRoomException('User already in this room');
+        }
+
+        // If not in room - let join
         $sql = "INSERT INTO room_user (room_id, user_id) VALUES (:room_id, :user_id)";
         $stmt = $this->connection->getConnection()->prepare($sql);
         $stmt->bindParam(':room_id', $roomId);

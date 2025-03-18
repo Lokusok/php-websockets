@@ -2,6 +2,7 @@
 
 namespace App\Strategies\Room;
 
+use App\Exceptions\AlreadyInRoomException;
 use App\MessageTypes\RoomEnum;
 use App\Pools\SocketPool;
 use App\Services\RoomService;
@@ -20,10 +21,19 @@ class RoomJoinStrategy implements StrategyInterface
 
     public function handle(Server $ws, Frame $frame): void
     {
-        $this->roomService->joinRoom($this->roomId, $this->userId);
+        try {
+            $this->roomService->joinRoom($this->roomId, $this->userId);
+        } catch (AlreadyInRoomException $exception) {
+            $ws->push($frame->fd, json_encode([
+                'type' => RoomEnum::ROOM_JOIN_ERROR->value,
+                'data' => [
+                    'message' => $exception->getMessage(),
+                ],
+            ]));
+        }
 
         $usersPerRoom = $this->roomService->usersPerRoom();
-
+        
         SocketPool::broadcast($ws, json_encode([
             'type' => RoomEnum::ROOM_USERS_TOTAL->value,
             'data' => [

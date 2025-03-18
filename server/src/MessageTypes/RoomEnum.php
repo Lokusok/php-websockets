@@ -15,6 +15,7 @@ enum RoomEnum: string
     case ROOM_DELETE_ERROR = 'room.delete.error';
 
     case ROOM_JOIN = 'room.join';
+    case ROOM_JOIN_ERROR = 'room.join.error';
     case ROOM_JOIN_SUCCESS = 'room.join.success';
 
     case ROOM_EXIT = 'room.exit';
