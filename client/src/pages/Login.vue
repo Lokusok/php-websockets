@@ -1,12 +1,14 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
-import { useWebSocket } from '@vueuse/core';
 
-import wsConfig from '../config/ws';
 import useSessionStorage from '../composables/useSessionStorage';
 
-const { status, data, send, open, close } = useWebSocket(wsConfig.url);
+const props = defineProps({
+    ws: Object,
+});
+
+const { status, data, send, open, close } = props.ws;
 const sessionStorage = useSessionStorage();
 const router = useRouter();
 

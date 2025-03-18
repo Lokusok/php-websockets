@@ -1,7 +1,11 @@
 <script setup>
+import { useWebSocket } from '@vueuse/core';
 import useSessionStorage from '../composables/useSessionStorage';
+import wsConfig from '../config/ws';
 
 const sessionStorage = useSessionStorage();
+
+const ws = useWebSocket(wsConfig.url);
 </script>
 
 <template>
@@ -11,5 +15,10 @@ const sessionStorage = useSessionStorage();
 
   <hr>
 
-  <router-view></router-view>
+  <router-view v-slot="{ Component }">
+    <component
+      :is="Component"
+      :ws="ws"
+    />
+  </router-view>
 </template>

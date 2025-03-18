@@ -1,12 +1,13 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useWebSocket } from '@vueuse/core';
-
-import wsConfig from '../config/ws';
 import useSessionStorage from '../composables/useSessionStorage';
 
-const { status, data, send, open, close } = useWebSocket(wsConfig.url);
+const props = defineProps({
+    ws: Object,
+});
+
+const { status, data, send, open, close } = props.ws;
 const sessionStorage = useSessionStorage();
 
 const router = useRouter();
@@ -147,7 +148,6 @@ watch(data, () => {
             </span>
             <router-link
                 :to="{ name: 'room', params: { id: room.id } }"
-                @click="callbacks.joinRoom(room.id)"
             >
                 Join room
             </router-link>

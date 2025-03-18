@@ -1,12 +1,13 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useWebSocket } from '@vueuse/core';
-
-import wsConfig from '../config/ws';
 import useSessionStorage from '../composables/useSessionStorage';
 
-const { status, data, send, open, close } = useWebSocket(wsConfig.url);
+const props = defineProps({
+    ws: Object,
+});
+
+const { status, data, send, open, close } = props.ws;
 const sessionStorage = useSessionStorage();
 
 const usersTotalInRoom = ref(null);
@@ -21,11 +22,6 @@ if (! sessionStorage.value.token) {
 
 const callbacks = {
     joinRoom() {
-        console.log('Join to room: ', {
-                user_id: sessionStorage.value.userId,
-                room_id: route.params.id,
-            });
-
         send(JSON.stringify({
             type: 'room.join',
             data: {
@@ -59,9 +55,7 @@ watch(data, () => {
 
     switch (parsedData.type) {
         case 'room.exit.success': {
-            setTimeout(() => {
-                router.replace({ name: 'home' });
-            }, 500);
+            router.replace({ name: 'home' });
             break;
         }
         case 'room.users_total': {
