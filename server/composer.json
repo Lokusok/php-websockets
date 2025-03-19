@@ -1,0 +1,11 @@
+{
+    "name": "lokusok/phpws",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.1"
+    }
+}
