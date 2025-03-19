@@ -11,11 +11,5 @@ class Open
     public static function handle(Server $ws, Request $request): void
     {
         SocketPool::push($request->fd);
-
-        $ws->push($request->fd, json_encode([
-            'data' => [
-                'message' => 'Hello, Welcome'
-            ]
-        ]));
     }
 }

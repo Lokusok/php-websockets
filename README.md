@@ -1,4 +1,4 @@
-# Realtime Chat on PHP
+# Realtime Chat on PHP (PoC)
 
 - `/server` - серверная часть (PHP)
 - `/client` - клиентская часть (JS/Vue)

@@ -1,2 +1,3 @@
 /server/vendor
+/server/database.db
 /client/node_modules
