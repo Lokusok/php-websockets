@@ -22,4 +22,10 @@ class SocketPool
             $ws->push($clientId, $data);
         }
     }
+
+    public static function removeClient(int $clientId): void
+    {
+        $clientIndex = array_find_key(self::$clients, fn ($id) => $id === $clientId);
+        array_splice(self::$clients, $clientIndex, 1);
+    }
 }

@@ -2,12 +2,14 @@
 
 namespace App\Actions;
 
+use App\Pools\SocketPool;
 use Swoole\WebSocket\Server;
 
 class Close
 {
     public function handle(Server $ws, int $fd): void
     {
-        echo "client-{$fd} is closed\n" . PHP_EOL;
+        SocketPool::removeClient($fd);
+        echo "{$fd} is closed" . PHP_EOL;
     }
 }
