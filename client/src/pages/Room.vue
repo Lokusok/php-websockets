@@ -78,8 +78,6 @@ onMounted(() => {
 watch(data, () => {
     const parsedData = JSON.parse(data.value);
 
-    console.log(parsedData);
-
     switch (parsedData.type) {
         case 'room.exit.success': {
             router.replace({ name: 'home' });

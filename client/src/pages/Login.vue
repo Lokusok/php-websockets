@@ -12,8 +12,12 @@ const { status, data, send, open, close } = props.ws;
 const sessionStorage = useSessionStorage();
 const router = useRouter();
 
+if (sessionStorage.value.token) {
+    router.replace({ name: 'home' });
+}
+
 const username = ref('');
-const waiting = ref(false);
+const waitingLogin = ref(false);
 const error = ref('');
 
 onMounted(() => {
@@ -34,11 +38,12 @@ const callbacks = {
       type: 'connect',
       data: {
         username: username.value.trim(),
+        token: null,
       }
     }));
 
     username.value = '';
-    waiting.value = true;
+    waitingLogin.value = true;
   },
 };
 
@@ -47,7 +52,7 @@ watch(data, () => {
 
   error.value = '';
 
-  waiting.value = false;
+  waitingLogin.value = false;
 
   switch (parsedData.type) {
     case 'connect.success': {
@@ -70,12 +75,12 @@ watch(data, () => {
 <template>
   <h1>Login</h1>
 
-  <p v-if="waiting">Loading...</p>
+  <p v-if="waitingLogin">Loading...</p>
   <p v-if="error" style="color: red">{{ error }}</p>
 
   <form @submit.prevent="callbacks.login">
     <input v-model="username" type="username">
     <br>
-    <button :disabled="! username || waiting">Enter chat</button>
+    <button :disabled="! username || waitingLogin">Enter chat</button>
   </form>
 </template>

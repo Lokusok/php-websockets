@@ -19,7 +19,7 @@ if (! sessionStorage.value.token) {
 const roomTitle = ref('');
 const rooms = ref([]);
 const error = ref('');
-const waiting = ref(false);
+const waitingDelete = ref(false);
 
 const callbacks = {
     fetchAllRooms() {
@@ -51,7 +51,7 @@ const callbacks = {
                 room_id: roomId
             },
         }));
-        waiting.value = true;
+        waitingDelete.value = true;
     },
 };
 
@@ -63,8 +63,6 @@ watch(data, () => {
     const parsedData = JSON.parse(data.value);
 
     error.value = '';
-
-    console.log(parsedData);
 
     switch (parsedData.type) {
         case 'room.create.success': {
@@ -106,7 +104,7 @@ watch(data, () => {
         }
     }
 
-    waiting.value = false;
+    waitingDelete.value = false;
 });
 </script>
 
@@ -156,7 +154,7 @@ watch(data, () => {
             <div style="display: flex; gap: 10px;">
                 <button
                     v-if="room.user_id === sessionStorage.userId"
-                    :disabled="waiting"
+                    :disabled="waitingDelete"
                     @click="callbacks.deleteRoom(room.id)"
                 >
                     Delete
