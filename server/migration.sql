@@ -4,8 +4,4 @@ CREATE TABLE `rooms` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `title` TEXT UNIQU
 CREATE TABLE `room_user` (`user_id` INTEGER REFERENCES `users`(`id`), `room_id` INTEGER REFERENCES `rooms`(`id`));
 CREATE TABLE IF NOT EXISTS "users" (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `username` TEXT UNIQUE, token TEXT UNIQUE);
 CREATE TABLE `messages` (`id` INTEGER PRIMARY KEY AUTOINCREMENT, `content` TEXT, `user_id` INTEGER REFERENCES `users`(`id`), `room_id` INTEGER REFERENCES `rooms`(`id`));
-DELETE FROM sqlite_sequence;
-INSERT INTO sqlite_sequence VALUES('users',4);
-INSERT INTO sqlite_sequence VALUES('rooms',23);
-INSERT INTO sqlite_sequence VALUES('messages',14);
 COMMIT;
