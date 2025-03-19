@@ -14,8 +14,8 @@ abstract class BaseService
         $this->connection = Connection::create();
     }
 
-    public function isUniqueException(\Exception $exception)
+    public function isUniqueException(\Exception $exception): int
     {
-        return (int) $exception->getCode() === Errors::UNIQUE->value;
+        return (int) ($exception->getCode() === Errors::UNIQUE->value);
     }
 }

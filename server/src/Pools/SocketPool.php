@@ -11,7 +11,7 @@ class SocketPool
      */
     private static array $clients = [];
 
-    public static function push(int $clientId)
+    public static function push(int $clientId): void
     {
         self::$clients[] = $clientId;
     }

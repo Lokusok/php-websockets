@@ -16,7 +16,7 @@ class SessionService extends BaseService
         $userId = $stmt->fetchColumn();
 
         if ($userId) {
-            return $userId;
+            return (int) $userId;
         }
 
         // If no - start creating in db
@@ -30,6 +30,10 @@ class SessionService extends BaseService
             $stmt->execute();
 
             $userId = $this->connection->getConnection()->lastInsertId();
+
+            if ($userId !== false) {
+                $userId = (int) $userId;
+            }
         } catch (\PDOException $exception)  {
             if ($this->isUniqueException($exception)) {
                 throw new UniqueException('Username must be unique');

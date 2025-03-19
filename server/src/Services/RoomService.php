@@ -34,6 +34,10 @@ class RoomService extends BaseService
             $stmt->execute();
 
             $roomId = $this->connection->getConnection()->lastInsertId();
+
+            if ($roomId !== false) {
+                $roomId = (int) $roomId;
+            }
         } catch (\PDOException $exception) {
             if ($this->isUniqueException($exception)) {
                 throw new UniqueException('Room title must be unique');
@@ -90,7 +94,7 @@ class RoomService extends BaseService
     /**
      * Get rooms ids where user with given id inside
      *
-     * @return array<int, int>
+     * @return array<int, bool>
      */
     public function roomsByUser(int $userId): array
     {
@@ -160,6 +164,10 @@ class RoomService extends BaseService
         $stmt->execute();
 
         $messageId = $this->connection->getConnection()->lastInsertId();
+
+        if ($messageId !== false) {
+            $messageId = (int) $messageId;
+        }
 
         return $messageId;
     }
