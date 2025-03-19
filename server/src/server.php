@@ -13,9 +13,9 @@ use Swoole\WebSocket\Server;
 $port = 9502;
 $ws = new Server('0.0.0.0', $port);
 
-$ws->on('Start', Start::handle(...));
-$ws->on('Open', Open::handle(...));
+$ws->on('Start', [new Start, 'handle']);
+$ws->on('Open', [new Open, 'handle']);
 $ws->on('Message', [new Message, 'handle']);
-$ws->on('Close', Close::handle(...));
+$ws->on('Close', [new Close, 'handle']);
 
 $ws->start();
