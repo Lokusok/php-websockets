@@ -20,10 +20,6 @@ class RoomFetchAllMessagesStrategy implements StrategyInterface
     {
         $messages = $this->roomService->getAllMessagesFromRoom($this->roomId);
 
-        echo 'Messages: ' . PHP_EOL;
-        var_dump($messages);
-        echo '----------' . PHP_EOL;
-
         $ws->push($frame->fd, json_encode([
             'type' => RoomEnum::ROOM_MESSAGE_FETCH_ALL_SUCCESS,
             'data' => [

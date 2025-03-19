@@ -18,9 +18,6 @@ class SocketPool
 
     public static function broadcast(Server $ws, string $data): void
     {
-        echo 'Clients for broadcast' . PHP_EOL;
-        var_dump(self::$clients);
-
         foreach (self::$clients as $clientId) {
             $ws->push($clientId, $data);
         }

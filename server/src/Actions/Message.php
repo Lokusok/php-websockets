@@ -12,7 +12,7 @@ class Message
     {
         $data = json_decode($frame->data, associative: true);
 
-        echo 'Data: ' . PHP_EOL;
+        echo 'Incoming data: ' . PHP_EOL;
         var_dump($data);
 
         $strategy = MessageStrategyFactory::choose($data);
